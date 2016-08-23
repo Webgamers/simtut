@@ -360,9 +360,9 @@
 																	"showShadow": true,
 																	"containerChangeable": false,
 																	"containerExtending": false,
-																	"left": 0,
-																	"top": 0,
-																	"width": 0,
+																	"left": 403,
+																	"top": 45,
+																	"width": 177,
 																	"height": 13,
 																	"autoResize": false,
 																	"underline": false,
@@ -879,6 +879,9 @@
 											"target": {
 												"$ref": "AAAAAAFWspvivTWeYj4="
 											},
+											"stereotype": {
+												"$ref": "AAAAAAFWspGaNDAmZjc="
+											},
 											"visibility": "public",
 											"messageSort": "synchCall",
 											"isConcurrentIteration": false
@@ -895,6 +898,9 @@
 											},
 											"target": {
 												"$ref": "AAAAAAFWspjE6TU8jOE="
+											},
+											"stereotype": {
+												"$ref": "AAAAAAFWspGaNDAmZjc="
 											},
 											"visibility": "public",
 											"messageSort": "reply",

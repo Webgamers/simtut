@@ -25,9 +25,12 @@
 //
 //                       M o d e l   i n c l u d e s
 #include "CGameViewport.h"
+#include "tMsgCreatePlayerReq.h"
+#include "tMsgCreatePlayerReply.h"
 /*
  *  These are the function prototypes for the message and signal processing functions.
  */
+static tMsg* createplayerreq(tSimObj* obj,tMsgCreatePlayerReq* msg) ;
 static int setvaluedb(tSimObj * obj, valueid_t  valueid, valueindex_t  valueindex, void*  value);
 static int setvalue(tSimObj * obj, valueid_t  valueid, valueindex_t  valueindex, void*  value);
 static void copy_from_template(tSimObj* obj, templateid_t tid);
@@ -45,6 +48,19 @@ static std::map<objectid_t, CGameViewport*> t_store;
  *
  *       !!!!    Here is a collection of functions that are editable.   !!!!
  */
+/* **************************************************************************
+ *
+ *  Method-Name   : createplayerreq()
+ *
+ *  Partial generated source code.
+ *
+ * *************************************************************************/
+static tMsg* createplayerreq(tSimObj* obj,tMsgCreatePlayerReq* msg) {
+    tMsg* retval=0;
+// User-Defined-Code:createplayerreq
+// End-Of-UDC:createplayerreq
+    return (retval);
+}
 // **************************************************************************
 //
 //  Method-Name   : save()
@@ -149,6 +165,9 @@ static tMsg* process_msg(tSimObj * obj, tMsg * msg) {
     tMsg *retmsg=0;
 
     switch (msg->id) {
+    case IDM_CREATEPLAYERREQ:
+        retmsg=createplayerreq(obj,(tMsgCreatePlayerReq*)(msg));
+        break;
     default:
         if (((msg->type == MSG_TYPE_REPLY) || (msg->type == MSG_TYPE_INDICATION)) && (obj->parent != 0) && (obj != obj->parent)) {
             retmsg = obj->parent->syncprocess(obj->parent, msg);
