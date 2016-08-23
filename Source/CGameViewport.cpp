@@ -26,11 +26,14 @@
 //                       M o d e l   i n c l u d e s
 #include "CGameViewport.h"
 #include "tMsgCreatePlayerReq.h"
+#include "tMsgPlayerHolidayReq.h"
+#include "tMsgPlayerHolidayReply.h"
 #include "tMsgCreatePlayerReply.h"
 /*
  *  These are the function prototypes for the message and signal processing functions.
  */
 static tMsg* createplayerreq(tSimObj* obj,tMsgCreatePlayerReq* msg) ;
+static tMsg* playerholidayreq(tSimObj* obj,tMsgPlayerHolidayReq* msg) ;
 static int setvaluedb(tSimObj * obj, valueid_t  valueid, valueindex_t  valueindex, void*  value);
 static int setvalue(tSimObj * obj, valueid_t  valueid, valueindex_t  valueindex, void*  value);
 static void copy_from_template(tSimObj* obj, templateid_t tid);
@@ -59,6 +62,19 @@ static tMsg* createplayerreq(tSimObj* obj,tMsgCreatePlayerReq* msg) {
     tMsg* retval=0;
 // User-Defined-Code:createplayerreq
 // End-Of-UDC:createplayerreq
+    return (retval);
+}
+/* **************************************************************************
+ *
+ *  Method-Name   : playerholidayreq()
+ *
+ *  Partial generated source code.
+ *
+ * *************************************************************************/
+static tMsg* playerholidayreq(tSimObj* obj,tMsgPlayerHolidayReq* msg) {
+    tMsg* retval=0;
+// User-Defined-Code:playerholidayreq
+// End-Of-UDC:playerholidayreq
     return (retval);
 }
 // **************************************************************************
@@ -167,6 +183,9 @@ static tMsg* process_msg(tSimObj * obj, tMsg * msg) {
     switch (msg->id) {
     case IDM_CREATEPLAYERREQ:
         retmsg=createplayerreq(obj,(tMsgCreatePlayerReq*)(msg));
+        break;
+    case IDM_PLAYERHOLIDAYREQ:
+        retmsg=playerholidayreq(obj,(tMsgPlayerHolidayReq*)(msg));
         break;
     default:
         if (((msg->type == MSG_TYPE_REPLY) || (msg->type == MSG_TYPE_INDICATION)) && (obj->parent != 0) && (obj != obj->parent)) {

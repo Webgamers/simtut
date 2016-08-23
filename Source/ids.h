@@ -29,6 +29,7 @@ typedef std::map<uint64_t, tSimObjRef>::iterator tObjectRefIterator;
 #define IDA_NAME            (0x842f3af822536317)
 #define IDA_PASSWORD        (0x3aff6d7112e2cfea)
 #define IDA_STATE           (0x9abc62b337d172c6)
+#define IDA_STATE_IDX       (0xf3eeb7b1abb2553e)
 //
 //
 //  This is the list of enumeration ids used to identify object enumerators in the DB

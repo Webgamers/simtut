@@ -1,6 +1,6 @@
 // *************************************************************************************************************
 //
-//  Modul-Name     : CPlayerViewport.h
+//  Modul-Name     : tMsgPlayerHolidayReq.h
 //
 //  Copyrights by Hans-Juergen Lange <hjl@simulated-universe.de>. All rights reserved.
 //
@@ -14,21 +14,19 @@
 //          |         |
 // HOC end *****************************************************************************************************
 #pragma once
-#ifndef CPLAYERVIEWPORT_INC
-#define CPLAYERVIEWPORT_INC
+#ifndef TMSGPLAYERHOLIDAYREQ_INC
+#define TMSGPLAYERHOLIDAYREQ_INC
 
+#define IDM_PLAYERHOLIDAYREQ 0xeccb5fa644a34fef
 //
-//                   S i m o b j e c t    d e c l a r a t i o n
-typedef struct __CPlayerViewport {
-    tSimObj     base;
-    std::string SessionId;
-    std::string Name;
-    std::string Email;
-    std::string Password;
-    int         state_idx;
-    tUpdate     state_fnc;
-} CPlayerViewport;
+//                   M e s s a g e c l a s s     d e c l a r a t i o n
+typedef struct __tMsgPlayerHolidayReq {
+    uint64_t   id;
+    void*      src;
+    void*      dst;
+    uint64_t   type;
+    objectid_t PlayerId;
+    uint64_t   HowLong;
+} tMsgPlayerHolidayReq;
 
-extern tObjLib cplayerviewport_factory;
-
-#endif  // CPLAYERVIEWPORT_INC
+#endif  // TMSGPLAYERHOLIDAYREQ_INC

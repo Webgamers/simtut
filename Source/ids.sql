@@ -19,6 +19,7 @@
 #define IDA_NAME            cast (x'842f3af822536317' as bigint)
 #define IDA_PASSWORD        cast (x'3aff6d7112e2cfea' as bigint)
 #define IDA_STATE           cast (x'9abc62b337d172c6' as bigint)
+#define IDA_STATE_IDX       cast (x'f3eeb7b1abb2553e' as bigint)
 --
 --
 --  This is the list of enumeration ids used to identify enumerator values in the DB

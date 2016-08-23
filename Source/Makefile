@@ -9,13 +9,13 @@ PROJ=WebGamers.so
 
 SRC=\
     _simifc.cpp\
-    CPlayerViewport.cpp\
-    CGameViewport.cpp
+    CGameViewport.cpp\
+    CPlayerViewport.cpp
 
 OBJ=\
     _simifc.o\
-    CPlayerViewport.o\
-    CGameViewport.o
+    CGameViewport.o\
+    CPlayerViewport.o
 
 CXXFLAGS+=-std=c++14 -fPIC -Wno-unused-function -O0
 
