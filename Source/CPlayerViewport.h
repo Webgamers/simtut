@@ -14,21 +14,22 @@
 //          |         |
 // HOC end *****************************************************************************************************
 #pragma once
-#ifndef CPLAYERVIEWPORT_INC
-#define CPLAYERVIEWPORT_INC
+#ifndef PLAYERVIEWPORT_INC
+#define PLAYERVIEWPORT_INC
 
 //
 //                   S i m o b j e c t    d e c l a r a t i o n
 typedef struct __CPlayerViewport {
-    tSimObj     base;
-    std::string SessionId;
-    std::string Name;
-    std::string Email;
-    std::string Password;
-    int         state_idx;
-    tUpdate     state_fnc;
+    tSimObj                          base;
+    std::string                      SessionId;
+    std::string                      Name;
+    std::string                      Email;
+    std::string                      Password;
+    std::map< uint64_t, tSimObjRef > Games;
+    int                              state_idx;
+    tUpdate                          state_fnc;
 } CPlayerViewport;
 
-extern tObjLib cplayerviewport_factory;
+extern tObjLib playerviewport_factory;
 
-#endif  // CPLAYERVIEWPORT_INC
+#endif  // PLAYERVIEWPORT_INC

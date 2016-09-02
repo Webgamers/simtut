@@ -40,6 +40,12 @@ static void copy_from_template(tSimObj* obj, templateid_t tid);
 /*
  *  These are accessor function to make the access easier.
  */
+inline static uint64_t& LastCycle(tSimObj* obj) {
+    return ((CGameViewport*)(obj))->LastCycle;
+}
+inline static std::map< uint64_t, tSimObjRef >& AllPlayers(tSimObj* obj) {
+    return ((CGameViewport*)(obj))->AllPlayers;
+}
 /*
  *  End of accessor functions
  */
@@ -86,8 +92,8 @@ static tMsg* playerholidayreq(tSimObj* obj,tMsgPlayerHolidayReq* msg) {
 // **************************************************************************
 static int save(tSimObj* obj, uint64_t aCycle, ... ) {
     int result = 0;
-// User-Defined-Code: save-cgameviewport
-// End-Of-UDC: save-cgameviewport
+// User-Defined-Code: save-gameviewport
+// End-Of-UDC: save-gameviewport
     return (result);
 }
 
@@ -102,11 +108,17 @@ static int save(tSimObj* obj, uint64_t aCycle, ... ) {
 // **************************************************************************
 static int setvalue(tSimObj * obj, valueid_t  valueid, valueindex_t  valueindex, void*  value) {
     int err=0;
-    CGameViewport* cgameviewport_var = (CGameViewport*)obj;
+    CGameViewport* gameviewport_var = (CGameViewport*)obj;
 
     switch (valueid) {
     case IDA_STATE:
         obj->state=*((uint64_t*)(value));
+        break;
+    case IDA_LASTCYCLE:
+        gameviewport_var->LastCycle=*((uint64_t*)(value));
+        break;
+    case IDA_ALLPLAYERS:
+        gameviewport_var->AllPlayers[valueindex]=tSimObjRef{*(objectid_t*)(value), 0};
         break;
     default:
         err=-1;
@@ -121,12 +133,25 @@ static int setvalue(tSimObj * obj, valueid_t  valueid, valueindex_t  valueindex,
 // **************************************************************************
 static int setvaluedb(tSimObj * obj, valueid_t  valueid, valueindex_t  valueindex, void*  value) {
     int err=0;
-    CGameViewport* cgameviewport_var = (CGameViewport*)obj;
+    CGameViewport* gameviewport_var = (CGameViewport*)obj;
 
     switch (valueid) {
     case IDA_STATE:
         obj->state=*((uint64_t*)(value));
         stdb_updatedata(obj->objid, IDA_STATE, 0, obj->state);
+        break;
+    case IDA_LASTCYCLE:
+        gameviewport_var->LastCycle=*((uint64_t*)(value));
+        stdb_updatedata(obj->objid, valueid, valueindex, (uint64_t)(gameviewport_var->LastCycle));
+        break;
+    case IDA_ALLPLAYERS:
+        if (gameviewport_var->AllPlayers.find(valueindex) == gameviewport_var->AllPlayers.end()) {
+            gameviewport_var->AllPlayers.insert(std::pair<uint64_t, tSimObjRef>(valueindex, tSimObjRef{*(objectid_t*)(value), simfindidx(*(objectid_t*)(value))}));
+            stdb_createreferencedata(obj->objid, valueid, valueindex, *(objectid_t*)(value));
+        } else {
+            gameviewport_var->AllPlayers[valueindex]=tSimObjRef{*(objectid_t*)(value), simfindidx(*(objectid_t*)(value))};
+            stdb_updatereferencedata(obj->objid, valueid, valueindex, *(objectid_t*)(value));
+        }
         break;
     default:
         err=-1;
@@ -142,6 +167,15 @@ static int setvaluedb(tSimObj * obj, valueid_t  valueid, valueindex_t  valueinde
 //
 // **************************************************************************
 static void init_object(tSimObj * obj, uint64_t  aCycle) {
+    /*
+     * Fill all references with the pointers.
+     */
+    for (std::map< uint64_t, tSimObjRef >::iterator i =AllPlayers(obj).begin(); i != AllPlayers(obj).end(); ++i) {
+        simfillref(&(i->second));
+        if (i->second.objptr != 0) {
+            i->second.objptr->parent = obj;
+        }
+    }
     /*
      *  This object has no statemachine.
      */
@@ -204,109 +238,120 @@ static tMsg* process_msg(tSimObj * obj, tMsg * msg) {
 //
 // **************************************************************************
 static void copy_from_template(tSimObj* obj, templateid_t  tid) {
-    CGameViewport* varcgameviewport = (CGameViewport*)obj;
+    CGameViewport* vargameviewport = (CGameViewport*)obj;
     std::map<objectid_t, CGameViewport*>::iterator found;
 
     found = t_store.find(tid);
     if (found != t_store.end()) {
+        setvaluedb(obj, IDA_LASTCYCLE, 0, &found->second->LastCycle);
     }
 }
 // **************************************************************************
 //
-//  Method-Name   : create_cgameviewport_obj()
+//  Method-Name   : create_gameviewport_obj()
 //
 //  Generated source code.
 //
 // **************************************************************************
-static tSimObj* create_cgameviewport_obj(objectid_t  oid) {
-    CGameViewport* newcgameviewport = new CGameViewport;
+static tSimObj* create_gameviewport_obj(objectid_t  oid) {
+    CGameViewport* newgameviewport = new CGameViewport;
 
-    if (newcgameviewport != 0) {
-        newcgameviewport->base.type        = IDO_CGAMEVIEWPORT;
-        newcgameviewport->base.objid       = oid;
-        newcgameviewport->base.parent      = 0;
-        newcgameviewport->base.state       = 0;
-        newcgameviewport->base.setvalue    = setvalue;
-        newcgameviewport->base.save        = save;
-        newcgameviewport->base.update      = init_object;
-        newcgameviewport->base.process     = process_sig;
-        newcgameviewport->base.syncprocess = process_msg;
+    if (newgameviewport != 0) {
+        newgameviewport->base.type        = IDO_GAMEVIEWPORT;
+        newgameviewport->base.objid       = oid;
+        newgameviewport->base.parent      = 0;
+        newgameviewport->base.state       = 0;
+        newgameviewport->base.setvalue    = setvalue;
+        newgameviewport->base.save        = save;
+        newgameviewport->base.update      = init_object;
+        newgameviewport->base.process     = process_sig;
+        newgameviewport->base.syncprocess = process_msg;
         if (0xc0000000 & oid) {
-            t_store.insert(std::pair<templateid_t, CGameViewport*>(oid, newcgameviewport));
+            t_store.insert(std::pair<templateid_t, CGameViewport*>(oid, newgameviewport));
         }
+        newgameviewport->LastCycle = 0;
     } else {
     }
-    return ((tSimObj*)newcgameviewport);
+    return ((tSimObj*)newgameviewport);
 }
 // **************************************************************************
 //
-//  Method-Name   : create_new_cgameviewport_obj()
+//  Method-Name   : create_new_gameviewport_obj()
 //
 //  Generated source code.
 //
 // **************************************************************************
-static tSimObj* create_new_cgameviewport_obj(objectid_t  oid) {
-    CGameViewport* newcgameviewport = new CGameViewport;
+static tSimObj* create_new_gameviewport_obj(objectid_t  oid) {
+    CGameViewport* newgameviewport = new CGameViewport;
 
-    if (newcgameviewport != 0) {
-        newcgameviewport->base.type        = IDO_CGAMEVIEWPORT;
-        newcgameviewport->base.objid       = oid;
-        newcgameviewport->base.parent      = 0;
-        newcgameviewport->base.state       = 0;
-        newcgameviewport->base.setvalue    = setvalue;
-        newcgameviewport->base.save        = save;
-        newcgameviewport->base.update      = init_object;
-        newcgameviewport->base.process     = process_sig;
-        newcgameviewport->base.syncprocess = process_msg;
+    if (newgameviewport != 0) {
+        newgameviewport->base.type        = IDO_GAMEVIEWPORT;
+        newgameviewport->base.objid       = oid;
+        newgameviewport->base.parent      = 0;
+        newgameviewport->base.state       = 0;
+        newgameviewport->base.setvalue    = setvalue;
+        newgameviewport->base.save        = save;
+        newgameviewport->base.update      = init_object;
+        newgameviewport->base.process     = process_sig;
+        newgameviewport->base.syncprocess = process_msg;
         //
         //  Create the object in the db.
-        stdb_createobj(oid, IDO_CGAMEVIEWPORT);
-        stdb_createdata(oid, IDA_STATE, 0, newcgameviewport->base.state);
+        stdb_createobj(oid, IDO_GAMEVIEWPORT);
+        stdb_createdata(oid, IDA_STATE, 0, newgameviewport->base.state);
         //
         //  Now fill the attributes with values.
+        newgameviewport->LastCycle = 0;
         //
         //  create the attribute data in the DB.
+        stdb_createdata(oid, IDA_LASTCYCLE, 0, (uint64_t)(newgameviewport->LastCycle));
     } else {
     }
-    return ((tSimObj*)newcgameviewport);
+    return ((tSimObj*)newgameviewport);
 }
 // **************************************************************************
 //
-//  Method-Name   : create_new_cgameviewport_obj_from_template()
+//  Method-Name   : create_new_gameviewport_obj_from_template()
 //
 //  Generated source code.
 //
 // **************************************************************************
-static tSimObj* create_new_cgameviewport_obj_from_template(templateid_t  tid, objectid_t  oid) {
-    CGameViewport* newcgameviewport = 0;
+static tSimObj* create_new_gameviewport_obj_from_template(templateid_t  tid, objectid_t  oid) {
+    CGameViewport* newgameviewport = 0;
     std::map<objectid_t, CGameViewport*>::iterator found;
 
     found = t_store.find(tid);
     if (found != t_store.end()) {
-        newcgameviewport = new CGameViewport;
-        if (newcgameviewport != 0) {
-            newcgameviewport->base.type        = IDO_CGAMEVIEWPORT;
-            newcgameviewport->base.objid       = oid;
-            newcgameviewport->base.parent      = 0;
-            newcgameviewport->base.state       = 0;
-            newcgameviewport->base.setvalue    = setvaluedb;
-            newcgameviewport->base.save        = save;
-            newcgameviewport->base.update      = init_object;
-            newcgameviewport->base.process     = process_sig;
-            newcgameviewport->base.syncprocess = process_msg;
+        newgameviewport = new CGameViewport;
+        if (newgameviewport != 0) {
+            newgameviewport->base.type        = IDO_GAMEVIEWPORT;
+            newgameviewport->base.objid       = oid;
+            newgameviewport->base.parent      = 0;
+            newgameviewport->base.state       = 0;
+            newgameviewport->base.setvalue    = setvaluedb;
+            newgameviewport->base.save        = save;
+            newgameviewport->base.update      = init_object;
+            newgameviewport->base.process     = process_sig;
+            newgameviewport->base.syncprocess = process_msg;
             //
             //  Create the object in the db.
-            stdb_createobj(oid, IDO_CGAMEVIEWPORT);
-            stdb_createdata(oid, IDA_STATE, 0, newcgameviewport->base.state);
+            stdb_createobj(oid, IDO_GAMEVIEWPORT);
+            stdb_createdata(oid, IDA_STATE, 0, newgameviewport->base.state);
             //
             //  Copy data from template.
+            newgameviewport->LastCycle = found->second->LastCycle;
             //
             //  create the attribute data in the DB.
+            stdb_createdata(oid, IDA_LASTCYCLE, 0, (uint64_t)(newgameviewport->LastCycle));
         } else {
         }
     } else {
     }
-    return ((tSimObj*)newcgameviewport);
+    return ((tSimObj*)newgameviewport);
 }
 
-tObjLib cgameviewport_factory= {0, 0, 0, IDO_CGAMEVIEWPORT, create_cgameviewport_obj, create_new_cgameviewport_obj, create_new_cgameviewport_obj_from_template};
+tObjLib gameviewport_factory= {0, 0, 0, IDO_GAMEVIEWPORT, create_gameviewport_obj, create_new_gameviewport_obj, create_new_gameviewport_obj_from_template};
+//
+//
+// this is a collection of left-over modifications.
+// // User-Defined-Code: save-cgameviewport
+// end-of-// User-Defined-Code: save-cgameviewport

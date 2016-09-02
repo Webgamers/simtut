@@ -30,6 +30,7 @@
 
 #include "CGameViewport.h"
 #include "CPlayerViewport.h"
+#include "CSinkShips.h"
 //
 //            S t a t i c   F u n c t i o n    p r o t o t y p e s
 //
@@ -122,8 +123,9 @@ void siminit(void) {
     msgtomap.insert(std::pair<uint64_t, msg_to_json>(IDM_CREATEPLAYERREPLY, msg_to_json_createplayerreply));
     msgtomap.insert(std::pair<uint64_t, msg_to_json>(IDM_PLAYERHOLIDAYREPLY, msg_to_json_playerholidayreply));
 
-    addsimobjfactory(&cgameviewport_factory);
-    addsimobjfactory(&cplayerviewport_factory);
+    addsimobjfactory(&gameviewport_factory);
+    addsimobjfactory(&playerviewport_factory);
+    addsimobjfactory(&sinkships_factory);
 }
 // **************************************************************************
 //

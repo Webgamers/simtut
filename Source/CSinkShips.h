@@ -1,6 +1,6 @@
 // *************************************************************************************************************
 //
-//  Modul-Name     : CGameViewport.h
+//  Modul-Name     : CSinkShips.h
 //
 //  Copyrights by Hans-Juergen Lange <hjl@simulated-universe.de>. All rights reserved.
 //
@@ -14,17 +14,15 @@
 //          |         |
 // HOC end *****************************************************************************************************
 #pragma once
-#ifndef GAMEVIEWPORT_INC
-#define GAMEVIEWPORT_INC
+#ifndef SINKSHIPS_INC
+#define SINKSHIPS_INC
 
 //
 //                   S i m o b j e c t    d e c l a r a t i o n
-typedef struct __CGameViewport {
-    tSimObj                          base;
-    uint64_t                         LastCycle;
-    std::map< uint64_t, tSimObjRef > AllPlayers;
-} CGameViewport;
+typedef struct __CSinkShips {
+    tSimObj base;
+} CSinkShips;
 
-extern tObjLib gameviewport_factory;
+extern tObjLib sinkships_factory;
 
-#endif  // GAMEVIEWPORT_INC
+#endif  // SINKSHIPS_INC
